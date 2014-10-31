@@ -1,9 +1,13 @@
 var express = require('express');
 var app = express();
+var expressHandlebars = require('express3-handlebars');
 var readline = require('readline');
 
 app.listen(8000);								         
-console.log("Listening for new clients on port 8000");
+//console.log("Listening for new clients on port 8000");
+app.engine('handlebars', expressHandlebars({defaultLayout:'main'}));
+app.set('view engine', 'handlebars');
+
 app.get('/', sendIndexPage);
 app.get('/index*', sendIndexPage);
 app.get('/minute/*', sendMinutes);
@@ -14,6 +18,9 @@ app.get('/reset', sendReset);
 
 app.get('/minute' , fetchMinutes);
 app.get('/hour' , fetchHours);
+app.get('/speed' , fetchSpeed);
+app.get('/timezone' , fetchTimezone);
+
 
 var readline = require('readline'); // include the readline module
 
@@ -24,6 +31,12 @@ var lineReader = readline.createInterface({
   output: process.stdout,
   terminal: false
 });
+
+var hour = 4;
+var minute = 4;
+var speed = 4;
+var timezone = 4;
+
 
 function fetchMinutes(request, response) {
   console.log('x');
@@ -41,9 +54,27 @@ function fetchHours(request, response) {
   });
 }
 
+function fetchSpeed(request, response) {
+  console.log('w');
+  lineReader.on('line', function (data) {
+    console.log(data);
+    response.end(data);
+  });
+}
+
+function fetchTimezone(request, response) {
+  console.log('y');
+  lineReader.on('line', function (data) {
+    console.log(data);
+    response.end(data);
+  });
+}
+
+
+
 function sendMinutes(request, response) {
   // the route is the first parameter of the URL request:
-  var minute = request.params[0];  
+  minute = request.params[0];  
   // send it out the console:
   console.log('m' + minute);     //should log 'm12'
   // send the data and close the connection:
@@ -52,7 +83,7 @@ function sendMinutes(request, response) {
 
 function sendHours(request, response) {
   // the route is the first parameter of the URL request:
-  var hour = request.params[0];  
+  hour = request.params[0];  
   // send it out the console:
   console.log('h' + hour);      //should log 'h12'
   // send the data and close the connection:
@@ -61,7 +92,7 @@ function sendHours(request, response) {
 
 function sendTimezone(request, response) {
   // the route is the first parameter of the URL request:
-  var timezone = request.params[0];  
+  timezone = request.params[0];  
   // send it out the console:
   console.log('t' + timezone);      //should log 'h/12'
   // send the data and close the connection:
@@ -70,12 +101,13 @@ function sendTimezone(request, response) {
 
 function sendSpeed(request, response) {
   // the route is the first parameter of the URL request:
-  var speed = request.params[0];  
+  speed = request.params[0];  
   // send it out the console:
   console.log('s' + speed);      //should log 'h/12'
   // send the data and close the connection:
   response.end(speed);
 }
+
 function sendReset(request, response) {
   // send it out the console:
   console.log('h' + 0); 
@@ -84,17 +116,19 @@ function sendReset(request, response) {
   console.log('s' + 1); 
   response.sendfile(__dirname + '/index.html');
   response.end();
-  // response.write("hours: " + 0);
-  // response.write("minutes: " + 0); 
-  // response.write("speed: " + 0); 
-  // response.write("timeZone: " + 0); 
-  // // send the data and close the connection:
-  // response.end();
 }
 
 
 function sendIndexPage(request, response) {
-  response.sendfile(__dirname + '/index.html');
+    response.render('home', {
+      hour : hour,
+      minute  : minute,
+      speed : speed,
+      timezone : timezone
+    });
+
+    
+  //response.sendfile(__dirname + '/index.html');
 }
 
 

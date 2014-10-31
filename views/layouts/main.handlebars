@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Clock API</title>
+
+	<script type="text/javascript">
+		function setTime(slider, textbox) {
+			textbox.value = slider.value;
+			var request = new XMLHttpRequest();
+				// GET /output/color/level, and make an asynchronous request:
+				request.open( "GET", '/' + textbox.id + "/" + slider.value, true );
+				// close the request:
+				request.send( null );
+		}
+
+	 </script>
+</head>
+		{{{ body }}}
+</html>
