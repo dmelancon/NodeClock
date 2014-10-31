@@ -2,7 +2,9 @@
 #include <Process.h>
 Process nodejs;
 int64_t mTime;                         //current time in seconds				
-int mDuration, mHour, mMin, mSec, mTimeZone;         //arduino 
+int mDuration, mHour, mMin, mSec, mTimeZone;         //arduino
+int previousTimeZone, timeZoneChange;
+
 float speedTime;
 int hour, minute, sec, timeZone;            //from Server, sending to website
 
@@ -14,18 +16,19 @@ void setup() {
   Bridge.begin();
   Serial.begin(9600);
 
-  while (!Serial);
+  //while (!Serial);
   
   // launch the echo.js script asynchronously:
   nodejs.runShellCommandAsynchronously("node /mnt/sda1/arduino/clockServer/server.js");
 
-  Serial.println("Started process");
+  //Serial.println("Started process");
   mTime = 0;
   hour = 0;
   minute = 0;
   sec = 0;
   timeZone = 0;
   mTimeZone = 0;
+  previousTimeZone = mTimeZone;
   speedTime = 1;
   setTime();
   currentIndex = 0;
@@ -33,72 +36,97 @@ void setup() {
 }
 
 void loop() {
-if (nodejs.running()) {
-    int inByte = nodejs.read();
-  //  Serial.write(inByte);
-    minute = mMin;
-    hour = mHour;
-    sec = mSec + 1;
-    mTimeZone = 0;
-    switch (inByte) {
-      case'h':     // hour
-        currentIndex = 1;
-        break;
-        
-      case 'm':    // minute
-        currentIndex = 2;
-        break;
-        
-      case 's':    // speed
-         currentIndex = 3;
-         
-        break;
-       
-      case 't':    // timezone
-          currentIndex = 4;
-        break;
-      case 'x':
-          currentIndex = 5;
+  if (nodejs.running()) {
+      int inByte = nodejs.read();
+    //  Serial.write(inByte);
+      minute = mMin;
+      hour = mHour;
+      sec = mSec + 1;
+      switch (inByte) {
+        case'h':     // hour
+          currentIndex = 1;
           break;
-   }
-  if (currentIndex == 1){
-    hour = nodejs.parseInt();
-    setTime(); 
-  }
-  if (currentIndex == 2){
-    minute = nodejs.parseInt();
-    setTime(); 
-  }
-  if (currentIndex == 3){
-    speedTime = nodejs.parseInt();
-    setTime(); 
-  }
-//  if (currentIndex == 4){
-//    timeZone = nodejs.parseInt();
-//    mTimeZone = timeZone-mTimeZone;
-//    setTime(); 
-//  }
-  if (currentIndex == 5){
-    Serial.println("X WAS SENT!!!");
-    while (nodejs.availavle()){
-      Serial.write(nodejs.write());
-      //nodejs.write('\n');
+        case 'm':    // minute
+          currentIndex = 2;
+          break;
+        case 's':    // speed
+           currentIndex = 3;
+          break;
+        case 't':    // timezone
+            currentIndex = 4;
+          break;
+        case 'x':    
+            currentIndex = 5;
+            break;
+        case 'q':
+            currentIndex = 6;
+            break;
+        case 'w':
+            currentIndex = 7;
+            break;   
+        case 'y':
+            currentIndex = 8;
+            break;   
+        case 'z':
+            currentIndex = 9;
+            break;   
+        case 'p':
+            currentIndex = 10;
+            break;  
+      }
+    if (currentIndex == 1){
+      hour = nodejs.parseInt();
+      timeZoneChange = 0;
+      setTime(); 
     }
-    //nodejs.write('\n');
-  }
-  currentIndex = 0;
-  }
-  stepTime(); 
+    if (currentIndex == 2){
+      minute = nodejs.parseInt();
+      setTime(); 
+    }
+    if (currentIndex == 3){
+      speedTime = nodejs.parseInt();
+      setTime(); 
+    }
+    if (currentIndex == 4){
+      timeZone = nodejs.parseInt();
+      timeZoneChange = timeZone - previousTimeZone;
+      previousTimeZone = timeZone;
+      //mTimeZone = timeZone;
+      setTime(); 
+    }
+    if (currentIndex == 5){
+      Serial.println("Minute requested!!!");
+        nodejs.println(minute);
+    }
+    if (currentIndex == 6){
+      Serial.println("Hour requested");
+        nodejs.println(hour);
+    }
+    if (currentIndex == 7){
+      Serial.println("Speed requested");
+      nodejs.println(speedTime);
+    }
+    if (currentIndex == 8){
+      Serial.println("Timezone requested!!!");
+      nodejs.println(previousTimeZone);
+    }
+    if (currentIndex == 9){
+      Serial.println("Still Connected");
+      //nodejs.println(previousTimeZone);
+    }
+    currentIndex = 0;
+    }
+    stepTime(); 
 }
 
 void setTime(){
 //  Serial.print("mTime before: ");
 //  Serial.print((double)mTime);
-//  if ((mTimeZone+hour)<0){
-//     mTime = (int64_t)(24+(mTimeZone + hour))*60*60 + minute*60 + sec;
-//  }else{
-    mTime = (int64_t)((mTimeZone + hour)%24)*60*60 + minute*60 + sec; 
-//  }
+  if ((timeZoneChange+hour)<0){
+     mTime = (int64_t)(24+(timeZoneChange + hour))*60*60 + minute*60 + sec;
+  }else{
+    mTime = (int64_t)((timeZoneChange + hour)%24)*60*60 + minute*60 + sec; 
+  }
 //  Serial.print(", mTime after: ");
 //  Serial.println((double)mTime);
   mDuration = 1000/speedTime;
@@ -108,7 +136,6 @@ void setTime(){
 void stepTime(){
    // Serial.println(time);
 int64_t time = millis();
-
  if (mDuration > 0){
     if( (time-prevTime) > mDuration ) {
       calcTime();
@@ -141,6 +168,8 @@ int64_t time = millis();
 }
 
 void calcTime(){
+  if (mTime == -1) mTime = ((int64_t)24*60*60 - 1);
+  //Serial.println((double)mTime);
   mSec  = mTime%60;
   mMin  = ((mTime - mSec)/60)%60;
   mHour = ((((mTime - mSec)/60) - mMin)/60)%24;
