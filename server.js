@@ -1,12 +1,18 @@
 var express = require('express');
 var app = express();
-var expressHandlebars = require('express3-handlebars');
+var hbs = require('express-hbs');
 var readline = require('readline');
 
 app.listen(8000);								         
 //console.log("Listening for new clients on port 8000");
-app.engine('handlebars', expressHandlebars({defaultLayout:'main'}));
-app.set('view engine', 'handlebars');
+
+
+// Use `.hbs` for extensions and find partials in `views/partials`.
+app.engine('hbs', hbs.express3({
+  partialsDir: __dirname + '/views/partials'
+}));
+app.set('view engine', 'hbs');
+app.set('views', __dirname + '/views');
 
 app.get('/', sendIndexPage);
 app.get('/index*', sendIndexPage);
@@ -20,7 +26,7 @@ app.get('/minute' , fetchMinutes);
 app.get('/hour' , fetchHours);
 app.get('/speed' , fetchSpeed);
 app.get('/timezone' , fetchTimezone);
-
+//app.get('/time', fetchTime);
 
 var readline = require('readline'); // include the readline module
 
@@ -32,43 +38,78 @@ var lineReader = readline.createInterface({
   terminal: false
 });
 
-var hour = 4;
-var minute = 4;
-var speed = 4;
-var timezone = 4;
+var hour = 0;
+var minute = 0;
+var speed = 1;
+var timezone = 0;
 
 
 function fetchMinutes(request, response) {
   console.log('x');
   lineReader.on('line', function (data) {
-    console.log(data);
-    response.end(data);
+    //console.log(data);
+    minute = data;
+    //response.end(data);
+    response.render('home', {
+      hour : hour,
+      minute  : minute,
+      speed : speed,
+      timezone : timezone
+    })
   });
 }
 
 function fetchHours(request, response) {
   console.log('q');
   lineReader.on('line', function (data) {
-    console.log(data);
-    response.end(data);
+    //console.log(data);
+    hour = data;
+    //response.end(data);
+    response.render('home', {
+      hour : hour,
+      minute  : minute,
+      speed : speed,
+      timezone : timezone
+    })
   });
 }
 
 function fetchSpeed(request, response) {
   console.log('w');
   lineReader.on('line', function (data) {
-    console.log(data);
-    response.end(data);
+    //console.log(data);
+    speed = data;
+    //response.end(data);
+    response.render('home', {
+      hour : hour,
+      minute  : minute,
+      speed : speed,
+      timezone : timezone
+    })
   });
 }
 
 function fetchTimezone(request, response) {
   console.log('y');
   lineReader.on('line', function (data) {
-    console.log(data);
-    response.end(data);
+    //console.log(data);
+    timezone = data;
+    //response.end(data);
+    response.render('home', {
+      hour : hour,
+      minute  : minute,
+      speed : speed,
+      timezone : timezone
+    })
   });
 }
+
+// function fetchTime(request, response){
+//   fetchTimezone(request, response);
+//   fetchSpeed(request, response);
+//   fetchHours(request, response);
+//   fetchMinutes(request, response);
+// }
 
 
 
@@ -110,10 +151,16 @@ function sendSpeed(request, response) {
 
 function sendReset(request, response) {
   // send it out the console:
-  console.log('h' + 0); 
-  console.log('m' + 0);    
   console.log('t' + 0); 
+  timezone = 0;
   console.log('s' + 1); 
+  speed = 1;
+  console.log('h' + 0); 
+  console.log('h' + 0); 
+  hour = 0;
+  console.log('m' + 0);    
+  minute = 0;
+
   response.sendfile(__dirname + '/index.html');
   response.end();
 }
@@ -126,8 +173,6 @@ function sendIndexPage(request, response) {
       speed : speed,
       timezone : timezone
     });
-
-    
   //response.sendfile(__dirname + '/index.html');
 }
 
