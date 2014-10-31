@@ -55,24 +55,21 @@ void loop() {
         case 't':    // timezone
             currentIndex = 4;
           break;
-        case 'x':    
+        case 'x':    //fetch minute
             currentIndex = 5;
             break;
-        case 'q':
+        case 'q':    //fetch hour
             currentIndex = 6;
             break;
-        case 'w':
+        case 'w':    //fetch speed
             currentIndex = 7;
             break;   
-        case 'y':
+        case 'y':    //fetch timezone
             currentIndex = 8;
             break;   
         case 'z':
             currentIndex = 9;
             break;   
-        case 'p':
-            currentIndex = 10;
-            break;  
       }
     if (currentIndex == 1){
       hour = nodejs.parseInt();

@@ -29,14 +29,15 @@ app.get('/timezone' , fetchTimezone);
 //app.get('/time', fetchTime);
 
 var readline = require('readline'); // include the readline module
-
-   
+// var lineReader = readline.createInterface({
+// input: process.stdin,
+// output: process.stdout,
+// terminal: false
+// });
+// lineReader.pause();
+ 
 // create an interface to read lines from the Arduino:
-var lineReader = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
-});
+
 
 var hour = 0;
 var minute = 0;
@@ -45,72 +46,64 @@ var timezone = 0;
 
 
 function fetchMinutes(request, response) {
+  var lineReader = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+    });
   console.log('x');
   lineReader.on('line', function (data) {
-    //console.log(data);
     minute = data;
-    //response.end(data);
-    response.render('home', {
-      hour : hour,
-      minute  : minute,
-      speed : speed,
-      timezone : timezone
-    })
+    response.end("Minute: " + minute);
+    lineReader.close();
   });
 }
 
 function fetchHours(request, response) {
+  var lineReader = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+    });
   console.log('q');
   lineReader.on('line', function (data) {
-    //console.log(data);
     hour = data;
-    //response.end(data);
-    response.render('home', {
-      hour : hour,
-      minute  : minute,
-      speed : speed,
-      timezone : timezone
-    })
+    response.end("hour : " + hour);
+    lineReader.close();
   });
 }
 
+
 function fetchSpeed(request, response) {
+  var lineReader = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+    });
   console.log('w');
   lineReader.on('line', function (data) {
-    //console.log(data);
     speed = data;
-    //response.end(data);
-    response.render('home', {
-      hour : hour,
-      minute  : minute,
-      speed : speed,
-      timezone : timezone
-    })
+    response.end('Speed: '+ speed);
+    lineReader.close();
   });
+   
 }
 
 function fetchTimezone(request, response) {
+  var lineReader = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+    });
   console.log('y');
   lineReader.on('line', function (data) {
     //console.log(data);
     timezone = data;
-    //response.end(data);
-    response.render('home', {
-      hour : hour,
-      minute  : minute,
-      speed : speed,
-      timezone : timezone
-    })
+    response.end("Timezone: " + timezone);
+    data = '';
+    lineReader.close();
   });
 }
-
-// function fetchTime(request, response){
-//   fetchTimezone(request, response);
-//   fetchSpeed(request, response);
-//   fetchHours(request, response);
-//   fetchMinutes(request, response);
-// }
-
 
 
 function sendMinutes(request, response) {
@@ -160,20 +153,22 @@ function sendReset(request, response) {
   hour = 0;
   console.log('m' + 0);    
   minute = 0;
-
-  response.sendfile(__dirname + '/index.html');
-  response.end();
+  response.render('home', {
+      mHour : hour,
+      mMinute  : minute,
+      mSpeed : speed,
+      mTimezone : timezone
+    });
 }
 
 
 function sendIndexPage(request, response) {
     response.render('home', {
-      hour : hour,
-      minute  : minute,
-      speed : speed,
-      timezone : timezone
+      mHour : hour,
+      mMinute  : minute,
+      mSpeed : speed,
+      mTimezone : timezone
     });
-  //response.sendfile(__dirname + '/index.html');
 }
 
 

@@ -2,15 +2,15 @@
 
 <h1>Set Time</h1>
 <body>
-<input type="range" id="blueSlider" min="0" max="23" value = "{{hour}}" onchange="setTime(this, hour);">
-	<input type="text" id="hour" value = "{{hour}}" size=8> Hour <br>
-	<input type="range" id="blueSlider" min="0" max="59"  value = "{{minute}}" onchange="setTime(this, minute);">
-	<input type="text" id="minute" value = "{{minute}}" size=8> Minute <br>
+<input type="range" id="hourSlider" min="0" max="23" value = "{{mHour}}" onchange="setTime(this, hour);">
+	<input type="text" id="hour" value = "{{mHour}}" size=8> Hour <br>
+	<input type="range" id="minSlider" min="0" max="59"  value = "{{mMinute}}" onchange="setTime(this, minute);">
+	<input type="text" id="minute" value = "{{mMinute}}" size=8> Minute <br>
 
-	<input type="range" id="blueSlider" min="-10" max="10" value="{{speed}}" onchange="setTime(this, speed);">
-	<input type="text" id="speed" value = "{{speed}}" size=8> Speed <br>
+	<input type="range" id="speedSlider" min="-10" max="10" value="{{mSpeed}}" onchange="setTime(this, speed);">
+	<input type="text" id="speed" value = "{{mSpeed}}" size=8> Speed <br>
 
-	<input type="range" id="blueSlider" min="-23" max="23" value = "{{timezone}}" onchange="setTime(this, timeZone);">
-	<input type="text" id="timeZone" value = "{{timezone}}" size=8> Timezone <br>
+	<input type="range" id="timeSlider" min="-23" max="23" value = "{{mTimezone}}" onchange="setTime(this, timeZone);">
+	<input type="text" id="timeZone" value = "{{mTimezone}}" size=8> Timezone <br>
 </body>
 
